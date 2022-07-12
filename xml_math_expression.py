@@ -6,11 +6,11 @@ class formulaequationinput(xml_elements.single_tag):
         self.name = "formulaequationinput"
 
 class responseparam(xml_elements.single_tag):
-    def __init__(self, dash):
+    def __init__(self, dash, value):
         super().__init__(dash)
         self.name = "responseparam"
         self.add_tolerance()
-        self.add_default("1%")
+        self.add_default(value)
 
     def add_tolerance(self):
         self.add_property("type", "tolerance")
@@ -21,9 +21,16 @@ class responseparam(xml_elements.single_tag):
 class formularesponse(xml_elements.intermediate_container):
     corr_feedback_added = False
 
-    def __init__(self, dash, full_question):
+    def __init__(self, dash, full_question, toler):
         super().__init__(dash)
         self.name = "formularesponse"
+        self.tolerance = toler
+        def_feedback = full_question.find("\nDefault Feedback:")
+        def_feedback_text = ""
+        if def_feedback > -1:
+            def_feedback_text = full_question[def_feedback + 18: ]
+            full_question = full_question[: def_feedback]
+            self.add_solution(def_feedback_text)
         next_truth = full_question.find("\n*")
         next = full_question.find("\nA:")
         if next == -1:
@@ -49,7 +56,7 @@ class formularesponse(xml_elements.intermediate_container):
 
     def add_label(self, question):
         new_label = xml_elements.label(self.dash + 2, question)
-        self.list.append(new_label)
+        self.list.insert(0, new_label)
 
     def add_answer(self, expr):
         standart = []
@@ -96,11 +103,23 @@ class formularesponse(xml_elements.intermediate_container):
 
     def add_formulaequationinput(self):
         new_formulaequationinput = formulaequationinput(self.dash + 2)
-        self.list.append(new_formulaequationinput)
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label"])):
+            i += 1
+        self.list.insert(i, new_formulaequationinput)
 
     def add_responseparam(self):
-        new_responseparam = responseparam(self.dash + 2)
-        self.list.append(new_responseparam)
+        new_responseparam = responseparam(self.dash + 2, self.tolerance)
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput"])):
+            i += 1
+        self.list.insert(i, new_responseparam)
+
+    def add_solution(self, text):
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput", "responseparam"])):
+            i += 1
+        self.list.insert(i, xml_elements.solution(self.dash + 2, text))
         
 
 

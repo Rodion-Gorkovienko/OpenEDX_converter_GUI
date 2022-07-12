@@ -2,6 +2,7 @@ import codecs
 import os
 import errno
 import shutil
+import tarfile
 
 def make_sure_path_exists(path):
     try:
@@ -9,6 +10,10 @@ def make_sure_path_exists(path):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
+
+def make_tarfile(output_filename, source_dir):
+    with tarfile.open(output_filename, "w:gz") as tar:
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
 
 def clear_dir(folder):
     for filename in os.listdir(folder):
@@ -21,8 +26,11 @@ def clear_dir(folder):
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-def drop_files(directory, lib, problems, names):
+def drop_files(root_directory, lib, problems, names):
     print("Result recording started")
+    directory = root_directory + "\\library"
+    make_sure_path_exists(directory)
+    clear_dir(directory)
     lib_file = codecs.open(directory + "\\library.xml", "w+", "UTF-8")
     lib_file.write(lib)
     lib_file.close()
@@ -41,5 +49,6 @@ def drop_files(directory, lib, problems, names):
     assets_file = codecs.open(new_dir + "\\assets.json", "w+", "UTF-8")
     assets_file.write("{}")
     assets_file.close()
+    make_tarfile(directory + ".tar.gz", directory)
     print("Result recording completed")
 

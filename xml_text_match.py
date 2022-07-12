@@ -76,7 +76,9 @@ class stringresponse(xml_elements.intermediate_container):
 
     def add_answer(self, answer, type_of_answer):
         def_feedback = answer.find("\nDefault Feedback:")
+        def_feedback_text = ""
         if def_feedback > -1:
+            def_feedback_text = answer[def_feedback + 18: ]
             answer = answer[: def_feedback]
         feedback_start = answer.find("\nFeedback:")
         if feedback_start == -1:
@@ -96,6 +98,8 @@ class stringresponse(xml_elements.intermediate_container):
         else:
             if len(answer) - feedback_start > 10:
                 self.add_stringequalhint(str, answer[feedback_start + 10 :])
+        if def_feedback_text != "":
+            self.add_solution(def_feedback_text)
 
     def add_label(self, question):
         new_label = xml_elements.label(self.dash + 2, question)
@@ -111,20 +115,26 @@ class stringresponse(xml_elements.intermediate_container):
     def add_additional_answer(self, answer):
         new_additional_answer = additional_answer(self.dash + 2, answer)
         i = 0
-        while (len(self.list) > i and (self.list[i].name == "label" or self.list[i].name == "correcthint")):
+        while (len(self.list) > i and (self.list[i].name in ["label", "correcthint"])):
             i += 1
         self.list.insert(i, new_additional_answer)
 
     def add_stringequalhint(self, answer, hint):
         new_stringequalhint = stringequalhint(self.dash + 2, answer, hint)
         i = 0
-        while (len(self.list) > i and (self.list[i].name == "label" or self.list[i].name == "correcthint" or self.list[i].name == "additional_answer")):
+        while (len(self.list) > i and (self.list[i].name in ["label", "correcthint","additional_answer"])):
             i += 1
         self.list.insert(i, new_stringequalhint)
 
     def add_textline(self):
         new_textline = textline(self.dash + 2)
-        self.list.append(new_textline)
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label", "correcthint","additional_answer","stringequalhint"])):
+            i += 1
+        self.list.insert(i, new_textline)
 
-    #def add_shuffle(self):
-    #    self.add_property("shuffle", "true")
+    def add_solution(self, text):
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label", "correcthint","additional_answer","stringequalhint","textline"])):
+            i += 1
+        self.list.insert(i, xml_elements.solution(self.dash + 2, text))

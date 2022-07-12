@@ -39,6 +39,9 @@ class problem_attributes():
         self.showanswer="never" 
         self.video_speed_optimizations="true" 
         self.weight="1.0"
+        self.show_reset_button="false"
+        self.tolerance="1%"
+
 
 
 

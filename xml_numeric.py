@@ -20,11 +20,11 @@ class formulaequationinput(xml_elements.single_tag):
         self.name = "formulaequationinput"
 
 class responseparam(xml_elements.single_tag):
-    def __init__(self, dash):
+    def __init__(self, dash, value):
         super().__init__(dash)
         self.name = "responseparam"
         self.add_tolerance()
-        self.add_default("1%")
+        self.add_default(value)
 
     def add_tolerance(self):
         self.add_property("type", "tolerance")
@@ -35,9 +35,10 @@ class responseparam(xml_elements.single_tag):
 class numericalresponse(xml_elements.intermediate_container):
     corr_feedback_added = False
 
-    def __init__(self, dash, full_question):
+    def __init__(self, dash, full_question, toler):
         super().__init__(dash)
         self.name = "numericalresponse"
+        self.tolerance = toler
         self.corr_feedback_added = False
         next_truth = full_question.find("\n*")
         next = full_question.find("\nA:")
@@ -81,7 +82,9 @@ class numericalresponse(xml_elements.intermediate_container):
 
     def add_answer(self, answer):
         def_feedback = answer.find("\nDefault Feedback:")
+        def_feedback_text = ""
         if def_feedback > -1:
+            def_feedback_text = answer[def_feedback + 18: ]
             answer = answer[: def_feedback]
         feedback_start = answer.find("\nFeedback:")
         if feedback_start == -1:
@@ -99,6 +102,8 @@ class numericalresponse(xml_elements.intermediate_container):
             if self.corr_feedback_added == False and len(answer) - feedback_start > 10:
                 self.add_correcthint(answer[feedback_start + 10 :])
                 self.corr_feedback_added = True
+        if def_feedback_text != "":
+            self.add_solution(def_feedback_text)
 
     def is_number(self, str):
         try:
@@ -137,8 +142,14 @@ class numericalresponse(xml_elements.intermediate_container):
         self.list.insert(i, new_correcthint)
 
     def add_responseparam(self):
-        new_responseparam = responseparam(self.dash + 2)
-        self.list.append(new_responseparam)
+        new_responseparam = responseparam(self.dash + 2, self.tolerance)
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput", "additional_answer", "correcthint"])):
+            i += 1
+        self.list.insert(i, new_responseparam)
 
-    #def add_shuffle(self):
-    #    self.add_property("shuffle", "true")
+    def add_solution(self, text):
+        i = 0
+        while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput", "additional_answer", "correcthint", "responseparam"])):
+            i += 1
+        self.list.insert(i, xml_elements.solution(self.dash + 2, text))

@@ -117,5 +117,31 @@ class label(string_only_container):
         super().__init__(dash, (str.replace("\n"," ")).strip())
         self.name = "label"
 
-    def add_content(self, content):
-        self.list.append(content)
+class p(string_only_container):
+    def __init__(self, dash, str):
+        super().__init__(dash, (str.replace("\n"," ")).strip())
+        self.name = "p"
+
+class div(intermediate_container):
+
+    def __init__(self, dash=0, text=""):
+        super().__init__(dash)
+        self.name = "div"
+        self.add_p(text)
+        self.add_class("detailed-solution")
+
+    def add_class(self, value):
+        self.add_property("class", value)
+
+    def add_p(self, text):
+        self.list.append(p(self.dash + 2, text))
+
+class solution(intermediate_container):
+
+    def __init__(self, dash=0, text=""):
+        super().__init__(dash)
+        self.name = "solution"
+        self.add_div(text)
+
+    def add_div(self, text):
+        self.list.append(div(self.dash + 2, text))

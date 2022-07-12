@@ -115,19 +115,19 @@ def create_text_match_question(question):
     problem.add_content(stringresponse)
     return problem
 
-def create_math_expression_question(question):
+def create_math_expression_question(question, toler):
     if question.count('\n*') == 0:
         raise IncorrectSyntax("Question does not have a correct answer")
     problem = xml_elements.problem()
-    stringresponse = xml_math_expression.formularesponse(2, question)
+    stringresponse = xml_math_expression.formularesponse(2, question, toler)
     problem.add_content(stringresponse)
     return problem
 
-def create_numeric_question(question):
+def create_numeric_question(question, toler):
     if question.count('\n*') == 0:
         raise IncorrectSyntax("Question does not have a correct answer")
     problem = xml_elements.problem()
-    numericalresponse = xml_numeric.numericalresponse(2, question)
+    numericalresponse = xml_numeric.numericalresponse(2, question, toler)
     problem.add_content(numericalresponse)
     return problem
 
@@ -138,7 +138,7 @@ def random_problem_name():
         res = res + random.choice(hex)
     return res
 
-def parse_file(file_full_ref, library_attr, problems_attr):
+def parse_file(file_full_ref, library_attr, problems_attr, individually):
     doc = docx.Document(file_full_ref)
 
     #print(len(doc.paragraphs))
@@ -241,9 +241,9 @@ def parse_file(file_full_ref, library_attr, problems_attr):
             if options[0] ==  question_type.MULTIPLE_CHOICE:
                 problem = create_checkbox_question(options, full_question)
             if options[0] ==  question_type.NUMERIC:
-                problem = create_numeric_question(full_question)
+                problem = create_numeric_question(full_question, problems_attr.tolerance)
             if options[0] ==  question_type.MATH_EXPRESSION:
-                problem = create_math_expression_question(full_question)
+                problem = create_math_expression_question(full_question, problems_attr.tolerance)
             if options[0] ==  question_type.TEXT_MATCH:
                 problem = create_text_match_question(full_question)
 

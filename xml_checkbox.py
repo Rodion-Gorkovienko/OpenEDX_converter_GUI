@@ -36,11 +36,11 @@ class choice(xml_elements.fully_functional_container):
         new_choicehint.add_selected(True)
         self.list.append(new_choicehint)
 
-class checkgroup(xml_elements.intermediate_container):
+class checkboxgroup(xml_elements.intermediate_container):
 
     def __init__(self, dash, answers):
         super().__init__(dash)
-        self.name = "checkgroup"
+        self.name = "checkboxgroup"
         i = 0
         ans_i = 0
         while(i != -1 and i + 4 < len(answers)):
@@ -84,15 +84,15 @@ class choiceresponse(xml_elements.intermediate_container):
         if start_of_answers == len(full_question) + 1:
             start_of_answers = len(full_question)
         self.add_label(full_question[0 : start_of_answers])
-        self.add_checkgroup(full_question[start_of_answers : len(full_question)])
+        self.add_checkboxgroup(full_question[start_of_answers : len(full_question)])
 
     def add_label(self, question):
         new_label = xml_elements.label(self.dash + 2, question)
         self.list.append(new_label)
 
-    def add_checkgroup(self, answers):
-        new_checkgroup = checkgroup(self.dash + 2, answers)
-        self.list.append(new_checkgroup)
+    def add_checkboxgroup(self, answers):
+        new_checkboxgroup = checkboxgroup(self.dash + 2, answers)
+        self.list.append(new_checkboxgroup)
 
     #def add_shuffle(self):
     #    self.add_property("shuffle", "true")

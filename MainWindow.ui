@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
-    <height>533</height>
+    <width>1119</width>
+    <height>667</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>OpenEDX_converter</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -198,7 +198,42 @@
              <widget class="QComboBox" name="comboBox_showanswer">
               <item>
                <property name="text">
-                <string>После завершения</string>
+                <string>Выполнен</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Всегда</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Дан ответ</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Использована попытка</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Закрыт</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Ответ верен или прошёл срок сдачи</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Прошёл срок сдачи</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Никогда</string>
                </property>
               </item>
              </widget>
@@ -215,6 +250,16 @@
               <item>
                <property name="text">
                 <string>Никогда</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Всегда</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>При сбросе</string>
                </property>
               </item>
               <item>
@@ -310,6 +355,41 @@
                 <string>Никогда</string>
                </property>
               </item>
+              <item>
+               <property name="text">
+                <string>Всегда</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Дан ответ</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Использована попытка</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Закрыт</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Выполнен</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Ответ верен или прошёл срок сдачи</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Прошёл срок сдачи</string>
+               </property>
+              </item>
              </widget>
             </item>
             <item row="3" column="0">
@@ -328,16 +408,19 @@
               </item>
               <item>
                <property name="text">
+                <string>Всегда</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>При сбросе</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string>Никогда</string>
                </property>
               </item>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="label_weight">
-              <property name="text">
-               <string>Вес</string>
-              </property>
              </widget>
             </item>
             <item row="4" column="0">
@@ -354,6 +437,13 @@
               </property>
              </widget>
             </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_weight">
+              <property name="text">
+               <string>Вес</string>
+              </property>
+             </widget>
+            </item>
             <item row="5" column="1">
              <widget class="QDoubleSpinBox" name="doubleSpinBox_weight_q">
               <property name="decimals">
@@ -364,6 +454,63 @@
               </property>
               <property name="value">
                <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QLabel" name="label_individually">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Изменять настройки для каждого вопроса отдельно</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QCheckBox" name="checkBox_individually">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_show_reset_button_q">
+              <property name="text">
+               <string>Показывать кнопку &quot;Cбросить&quot;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QCheckBox" name="checkBox_show_reset_button_q">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Погрешность (где применимо)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLineEdit" name="lineEdit">
+              <property name="text">
+               <string>1%</string>
               </property>
              </widget>
             </item>
