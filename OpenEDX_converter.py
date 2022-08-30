@@ -1,10 +1,11 @@
-import docx_file_parsing
-import drop_OLX
 import os
 import sys
+from PyQt5 import QtCore, QtGui, QtWidgets
+import docx_file_parsing
+import drop_OLX
 import MainWindow
 import attributes
-from PyQt5 import QtCore, QtGui, QtWidgets
+from datetime import datetime
 
 class EmittingStream(QtCore.QObject):
     signal = QtCore.pyqtSignal(str)
@@ -31,15 +32,14 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
         sys.stdout = stream
         #sys.stderr = stream
         val = QtGui.QRegExpValidator(QtCore.QRegExp("[a-zA-Z0-9_]{0,255}"))
-        val_toler = QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]{1,255}(.{1,1}[0-9]{1,255}){0,1}%{0,1}"))
-        self.lineEdit.setText("")
+        val_toler = QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]{1,255}([.]{1,1}[0-9]{1,255}){0,1}%{0,1}"))
         self.lineEdit_library.setValidator(val)
         self.lineEdit_org.setValidator(val)
         self.lineEdit.setValidator(val_toler)
         #self.lineEdit.textChanged[str].connect(self.validate_toler)
 
     def validate_toler(self, somthing):
-        regex = QtCore.QRegExp("[0-9]{1,255}(.{1,1}[0-9]{1,255}){0,1}%{0,1}")
+        regex = QtCore.QRegExp("[0-9]{1,255}([.]{1,1}[0-9]{1,255}){0,1}%{0,1}")
         tmp = QtGui.QRegExpValidator(regex, self.lineEdit)
         state, new_text, new_position = tmp.validate(self.lineEdit.text(), self.lineEdit.cursorPosition())
         return(state)
@@ -76,22 +76,40 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
         library_rerandomize = self.comboBox_rerandomize.currentText()
         library_show_reset_button = self.checkBox_show_reset_button.isChecked()
         library_max_attempts = self.spinBox_max_attempts.value()
+        time = ""
+        if self.checkBox_time.isChecked():
+            time += str(datetime.now()).replace(" ", "_").replace(".", "-").replace(":", "-")
+            library_library += "_" + time
 
         questions_display_name = self.lineEdit_display_name_q.text()
         questions_show_correctness = self.comboBox_show_correctness_q.currentText()
         questions_showanswer = self.comboBox_showanswer_q.currentText()
         questions_rerandomize = self.comboBox_rerandomize_q.currentText()
         questions_max_attempts = self.spinBox_max_attempts_q.value()
-        questions_weight = self.doubleSpinBox_weight_q.value()
+        questions_weight = round(self.doubleSpinBox_weight_q.value(), 4)
         questions_show_reset_button = self.checkBox_show_reset_button_q.isChecked()
         questions_tolerance = self.lineEdit.text()
+        questions_submission_wait_seconds = self.spinBox_submission_wait_seconds_q.value()
         questions_individually = self.checkBox_individually.isChecked()
+        questions_reg_type_m = self.comboBox_reg_type_m.currentText()
+        questions_reg_type_t = self.comboBox_reg_type_t.currentText()
+        questions_trailing_text_m = self.lineEdit_trailing_text_m.text()
+        questions_trailing_text_n = self.lineEdit_trailing_text_n.text()
+        questions_trailing_text_t = self.lineEdit_trailing_text_t.text()
 
         file = self.lineEdit_file.text()
         dir = self.lineEdit_dir.text()
 
+        if os.path.exists(file) and os.path.exists(dir) and os.path.isfile(file) and os.path.isdir(dir):
+            if file[-5 : ] != ".docx":
+                print("This is not docx file.")
+                return
+        else:
+            print("Path to file or directory incorrect.")
+            return
+
         l_attr = attributes.library_attributes()
-        q_attr = attributes.problem_attributes()
+        q_attr = attributes.default_problem_attributes()
 
         #library
         if library_library != "":
@@ -113,7 +131,7 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
         elif library_show_correctness == "Никогда":
             l_attr.show_correctness = "never"
         else:
-            rise
+            raise
         #show_answer
         if library_showanswer == "Выполнен":
             l_attr.showanswer = "finished"
@@ -191,8 +209,8 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
             q_attr.rerandomize = "per_student"
         elif questions_rerandomize == "При сбросе":
             q_attr.rerandomize = "on_reset"
-        elif questions_rerandomize == "Никогда":
-            q_attr.rerandomize = "never"
+        elif questions_rerandomize == "Всегда":
+            q_attr.rerandomize = "always"
         else:
             raise
         #max_attenpts
@@ -204,24 +222,41 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
         q_attr.weight =  str(questions_weight)
         #reset_button
         if questions_show_reset_button:
-            q_attr.show_reset_button = "True"
+            q_attr.show_reset_button = "true"
         else:
-            q_attr.show_reset_button = "False"
+            q_attr.show_reset_button = "false"
         #tolerance
         if self.validate_toler(None) == 2:
             q_attr.tolerance = questions_tolerance
         else:
             print("Warning! The entered error value is invalid. Used standard - 1%")
             q_attr.tolerance = "1%"
+        #submission_wait_seconds
+        if questions_submission_wait_seconds != 0:
+            q_attr.submission_wait_seconds =  str(questions_submission_wait_seconds)
+        #reg_type
+        if questions_reg_type_m == "Чувств. к регистру":
+            q_attr.reg_type_m = "cs"
+        elif questions_reg_type_m == "Нечувств. к регистру":
+            q_attr.reg_type_m = "ci"
+        if questions_reg_type_t == "Чувств. к регистру":
+            q_attr.reg_type_t = "cs"
+        elif questions_reg_type_t == "Нечувств. к регистру":
+            q_attr.reg_type_t = "ci"
+        elif questions_reg_type_t == "Для рег. выражений, чувств. к регистру":
+            q_attr.reg_type_t = "regexp cs"
+        elif questions_reg_type_t == "Для рег. выражений, нечувств. к регистру":
+            q_attr.reg_type_t = "regexp ci"
+        #trailing_text
+        if questions_trailing_text_m != "":
+            q_attr.trailing_tex_m = questions_trailing_text_m
+        if questions_trailing_text_n != "":
+            q_attr.trailing_tex_n = questions_trailing_text_n
+        if questions_trailing_text_t != "":
+            q_attr.trailing_tex_t = questions_trailing_text_t
 
-        if os.path.exists(file) and os.path.exists(dir) and os.path.isfile(file) and os.path.isdir(dir):
-            if file[-5 : ] == ".docx":
-                lib, problems, problems_names = docx_file_parsing.parse_file(file, l_attr, q_attr, questions_individually)
-                drop_OLX.drop_files(dir, lib, problems, problems_names)
-            else:
-                print("This is not docx file.")
-        else:
-            print("Path to file or directory incorrect.")
+        lib, problems, problems_names = docx_file_parsing.parse_file(file, l_attr, q_attr, questions_individually)
+        drop_OLX.drop_files(dir, lib, problems, problems_names, time)
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow_shell()

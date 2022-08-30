@@ -5,6 +5,9 @@ class formulaequationinput(xml_elements.single_tag):
         super().__init__(dash)
         self.name = "formulaequationinput"
 
+    def add_trailing_text(self, text):
+        self.add_property("trailing_text", text)
+
 class responseparam(xml_elements.single_tag):
     def __init__(self, dash, value):
         super().__init__(dash)
@@ -18,13 +21,15 @@ class responseparam(xml_elements.single_tag):
     def add_default(self, value):
         self.add_property("default", value)
 
+    def set_tolerance(self, toler):
+        self.properties["default"] = toler
+
 class formularesponse(xml_elements.intermediate_container):
     corr_feedback_added = False
 
-    def __init__(self, dash, full_question, toler):
+    def __init__(self, dash, full_question):
         super().__init__(dash)
         self.name = "formularesponse"
-        self.tolerance = toler
         def_feedback = full_question.find("\nDefault Feedback:")
         def_feedback_text = ""
         if def_feedback > -1:
@@ -109,7 +114,7 @@ class formularesponse(xml_elements.intermediate_container):
         self.list.insert(i, new_formulaequationinput)
 
     def add_responseparam(self):
-        new_responseparam = responseparam(self.dash + 2, self.tolerance)
+        new_responseparam = responseparam(self.dash + 2, "1%")
         i = 0
         while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput"])):
             i += 1
@@ -120,6 +125,19 @@ class formularesponse(xml_elements.intermediate_container):
         while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput", "responseparam"])):
             i += 1
         self.list.insert(i, xml_elements.solution(self.dash + 2, text))
+
+    def set_tolerance(self, toler):
+        for elem in self.list:
+            if elem.name == "responseparam":
+                elem.set_tolerance(toler)
+
+    def set_trailing_text(self, text):
+        for elem in self.list:
+            if elem.name == "formulaequationinput":
+                elem.add_trailing_text(text)
+
+    def set_reg_type(self, type):
+        self.properties["type"] = type
         
 
 

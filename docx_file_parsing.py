@@ -7,6 +7,7 @@ import xml_text_match
 import xml_math_expression
 import xml_numeric
 import attributes
+import QCWindow_shell as QC
 import random
 from enum import Enum
 
@@ -82,6 +83,33 @@ def add_problem_attributes(problem, attr):
     problem.add_property("showanswer", attr.showanswer)
     problem.add_property("video_speed_optimizations", attr.video_speed_optimizations)
     problem.add_property("weight", attr.weight)
+    if attr.submission_wait_seconds != None:
+        problem.add_property("submission_wait_seconds", attr.submission_wait_seconds)
+
+def write_specified_option(option_name, question_announcement):
+    n = question_announcement.find(option_name)
+    if n != -1 and (question_announcement.count('\"', 0, n) + question_announcement.count(chr(8220), 0, n) + question_announcement.count(chr(8221), 0, n)) % 2 == 0:
+        n += len(option_name)
+        while question_announcement[n] == " ":
+            n += 1
+        if question_announcement[n] == "=":
+            n += 1
+            while question_announcement[n] == " ":
+                n += 1
+            if question_announcement[n] == '\"' or ord(question_announcement[n]) == 8220 or ord(question_announcement[n]) == 8221:
+                quote1 = question_announcement.find('\"', n+1)
+                quote2 = question_announcement.find(chr(8220), n+1)
+                quote3 = question_announcement.find(chr(8221), n+1)
+                if quote1 == -1:
+                    quote1 = len(question_announcement)+1
+                if quote2 == -1:
+                    quote2 = len(question_announcement)+1
+                if quote3 == -1:
+                    quote3 = len(question_announcement)+1
+                end = min(quote1, quote2, quote3)
+                if end != -1:
+                    return MathJax_border_fix(question_announcement[n+1: end])
+
 
 def create_checkbox_question(options, question):
     if question.count('\n*') == 0:
@@ -107,27 +135,41 @@ def create_multiple_choice_question(options, question):
     problem.add_content(multiple_choice_response)
     return problem
 
-def create_text_match_question(question):
+def create_text_match_question(question, attr):
     if question.count('\n*') == 0:
         raise IncorrectSyntax("Question does not have a correct answer")
     problem = xml_elements.problem()
     stringresponse = xml_text_match.stringresponse(2, question)
+    if attr.reg_type != None:
+        stringresponse.set_reg_type(attr.reg_type)
+    if attr.trailing_text != None:
+        stringresponse.set_trailing_text(attr.trailing_text)
     problem.add_content(stringresponse)
     return problem
 
-def create_math_expression_question(question, toler):
+def create_math_expression_question(question, attr):
     if question.count('\n*') == 0:
         raise IncorrectSyntax("Question does not have a correct answer")
     problem = xml_elements.problem()
-    stringresponse = xml_math_expression.formularesponse(2, question, toler)
+    stringresponse = xml_math_expression.formularesponse(2, question)
+    if attr.tolerance != None:
+        stringresponse.set_tolerance(attr.tolerance)
+    if attr.reg_type != None:
+        stringresponse.set_reg_type(attr.reg_type)
+    if attr.trailing_text != None:
+        stringresponse.set_trailing_text(attr.trailing_text)
     problem.add_content(stringresponse)
     return problem
 
-def create_numeric_question(question, toler):
+def create_numeric_question(question, attr):
     if question.count('\n*') == 0:
         raise IncorrectSyntax("Question does not have a correct answer")
     problem = xml_elements.problem()
-    numericalresponse = xml_numeric.numericalresponse(2, question, toler)
+    numericalresponse = xml_numeric.numericalresponse(2, question)
+    if attr.tolerance != None:
+        numericalresponse.set_tolerance(attr.tolerance)
+    if attr.trailing_text != None:
+        numericalresponse.set_trailing_text(attr.trailing_text)
     problem.add_content(numericalresponse)
     return problem
 
@@ -195,6 +237,7 @@ def parse_file(file_full_ref, library_attr, problems_attr, individually):
             full_question = united_text[start_of_question : end_of_question]
             #print(question_announcement)
             #print(full_question)
+            current_attr = attributes.refined_problem_attributes()
 
             #Type recognizing
             if question_announcement.find("multiple choice") != -1:
@@ -235,19 +278,54 @@ def parse_file(file_full_ref, library_attr, problems_attr, individually):
             if question_announcement.find("no partial credit") != -1:
                 options[2] = partial_credit.NO_PARTIAL_CREDIT
 
+            full_full_question = question_announcement + full_question
             full_question = MathJax_border_fix(full_question)
             if options[0] ==  question_type.SINGLE_CHOICE:
+                problems_attr.copy(current_attr)
+                if individually:
+                    QCWindow = QC.QCWindow_shell(current_attr, full_full_question)
+                    QCWindow.exec_()
+                    current_attr = QCWindow.get_attr()
                 problem = create_multiple_choice_question(options, full_question)
             if options[0] ==  question_type.MULTIPLE_CHOICE:
+                problems_attr.copy(current_attr)
+                if individually:
+                    QCWindow = QC.QCWindow_shell(current_attr, full_full_question)
+                    QCWindow.exec_()
+                    current_attr = QCWindow.get_attr()
                 problem = create_checkbox_question(options, full_question)
             if options[0] ==  question_type.NUMERIC:
-                problem = create_numeric_question(full_question, problems_attr.tolerance)
+                problems_attr.copy(current_attr, "n")
+                current_attr.tolerance = write_specified_option("tolerance", question_announcement)
+                current_attr.trailing_text = write_specified_option("trailing_text", question_announcement)
+                if individually:
+                    QCWindow = QC.QCWindow_numeric(current_attr, full_full_question)
+                    QCWindow.exec_()
+                    current_attr = QCWindow.get_attr()
+                problem = create_checkbox_question(options, full_question)
+                problem = create_numeric_question(full_question, current_attr)
             if options[0] ==  question_type.MATH_EXPRESSION:
-                problem = create_math_expression_question(full_question, problems_attr.tolerance)
+                problems_attr.copy(current_attr, "m")
+                current_attr.tolerance = write_specified_option("tolerance", question_announcement)
+                current_attr.reg_type = write_specified_option("type", question_announcement)
+                current_attr.trailing_text = write_specified_option("trailing_text", question_announcement)
+                if individually:
+                    QCWindow = QC.QCWindow_math_expression(current_attr, full_full_question)
+                    QCWindow.exec_()
+                    current_attr = QCWindow.get_attr()
+                problem = create_checkbox_question(options, full_question)
+                problem = create_math_expression_question(full_question, current_attr)
             if options[0] ==  question_type.TEXT_MATCH:
-                problem = create_text_match_question(full_question)
+                problems_attr.copy(current_attr, "t")
+                current_attr.reg_type = write_specified_option("type", question_announcement)
+                current_attr.trailing_text = write_specified_option("trailing_text", question_announcement)
+                if individually:
+                    QCWindow = QC.QCWindow_text_match(current_attr, full_full_question)
+                    QCWindow.exec_()
+                    current_attr = QCWindow.get_attr()
+                problem = create_text_match_question(full_question, current_attr)
 
-            add_problem_attributes(problem, problems_attr)
+            add_problem_attributes(problem, current_attr)
             problem_text = []
             problem.add_to_text(problem_text)
             problem_str = '\n'.join(problem_text)

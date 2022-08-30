@@ -28,6 +28,9 @@ class textline(xml_elements.single_tag):
         super().__init__(dash)
         self.name = "textline"
 
+    def add_trailing_text(self, text):
+        self.add_property("trailing_text", text)
+
 
 class stringresponse(xml_elements.intermediate_container):
     corr_feedback_added = False
@@ -138,3 +141,12 @@ class stringresponse(xml_elements.intermediate_container):
         while (len(self.list) > i and (self.list[i].name in ["label", "correcthint","additional_answer","stringequalhint","textline"])):
             i += 1
         self.list.insert(i, xml_elements.solution(self.dash + 2, text))
+
+
+    def set_trailing_text(self, text):
+        for elem in self.list:
+            if elem.name == "textline":
+                elem.add_trailing_text(text)
+
+    def set_reg_type(self, type):
+        self.properties["type"] = type

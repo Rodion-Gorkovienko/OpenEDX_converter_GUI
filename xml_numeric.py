@@ -19,6 +19,9 @@ class formulaequationinput(xml_elements.single_tag):
         super().__init__(dash)
         self.name = "formulaequationinput"
 
+    def add_trailing_text(self, text):
+        self.add_property("trailing_text", text)
+
 class responseparam(xml_elements.single_tag):
     def __init__(self, dash, value):
         super().__init__(dash)
@@ -32,13 +35,15 @@ class responseparam(xml_elements.single_tag):
     def add_default(self, value):
         self.add_property("default", value)
 
+    def set_tolerance(self, toler):
+        self.properties["default"] = toler
+
 class numericalresponse(xml_elements.intermediate_container):
     corr_feedback_added = False
 
-    def __init__(self, dash, full_question, toler):
+    def __init__(self, dash, full_question):
         super().__init__(dash)
         self.name = "numericalresponse"
-        self.tolerance = toler
         self.corr_feedback_added = False
         next_truth = full_question.find("\n*")
         next = full_question.find("\nA:")
@@ -142,7 +147,7 @@ class numericalresponse(xml_elements.intermediate_container):
         self.list.insert(i, new_correcthint)
 
     def add_responseparam(self):
-        new_responseparam = responseparam(self.dash + 2, self.tolerance)
+        new_responseparam = responseparam(self.dash + 2, "1%")
         i = 0
         while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput", "additional_answer", "correcthint"])):
             i += 1
@@ -153,3 +158,13 @@ class numericalresponse(xml_elements.intermediate_container):
         while (len(self.list) > i and (self.list[i].name in ["label", "formulaequationinput", "additional_answer", "correcthint", "responseparam"])):
             i += 1
         self.list.insert(i, xml_elements.solution(self.dash + 2, text))
+
+    def set_tolerance(self, toler):
+        for elem in self.list:
+            if elem.name == "responseparam":
+                elem.set_tolerance(toler)
+
+    def set_trailing_text(self, text):
+        for elem in self.list:
+            if elem.name == "formulaequationinput":
+                elem.add_trailing_text(text)

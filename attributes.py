@@ -41,8 +41,45 @@ class problem_attributes():
         self.weight="1.0"
         self.show_reset_button="false"
         self.tolerance="1%"
+        self.submission_wait_seconds = None
+
+class default_problem_attributes(problem_attributes):
+    def __init__(self):
+        super().__init__()
+        self.reg_type_t = None
+        self.reg_type_m = None
+        self.trailing_text_t = None
+        self.trailing_text_m = None
+        self.trailing_text_n = None
+
+    def copy(self, other, type = ""):
+        other.course_edit_method = self.course_edit_method 
+        other.display_name = self.display_name 
+        other.markdown = self.markdown 
+        other.max_attempts = self.max_attempts 
+        other.rerandomize = self.rerandomize 
+        other.show_correctness = self.show_correctness 
+        other.showanswer = self.showanswer
+        other.video_speed_optimizations = self.video_speed_optimizations
+        other.weight = self.weight
+        other.show_reset_button = self.show_reset_button
+        other.tolerance = self.tolerance
+        other.submission_wait_seconds = self.submission_wait_seconds
+        if type == "t":
+            other.reg_type = self.reg_type_t
+            other.trailing_text = self.trailing_text_t
+        elif type == "m":
+            other.reg_type = self.reg_type_m
+            other.trailing_text = self.trailing_text_m
+        elif type == "n":
+            other.trailing_text = self.trailing_text_n
 
 
+class refined_problem_attributes(problem_attributes):
+    def __init__(self):
+        super().__init__()
+        self.reg_type = None
+        self.trailing_text = None
 
 
 

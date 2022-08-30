@@ -30,6 +30,8 @@
     <Compile Include="MainWindow.py" />
     <Compile Include="OpenEDX_converter.py" />
     <Compile Include="docx_file_parsing.py" />
+    <Compile Include="QCWindow_shell.py" />
+    <Compile Include="QuestionChangingWindow.py" />
     <Compile Include="xml_checkbox.py" />
     <Compile Include="xml_elements.py" />
     <Compile Include="xml_library.py" />
