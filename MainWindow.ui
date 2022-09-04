@@ -96,8 +96,8 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-66</y>
-            <width>785</width>
+            <y>0</y>
+            <width>829</width>
             <height>845</height>
            </rect>
           </property>
@@ -188,8 +188,13 @@
                    <bool>false</bool>
                   </property>
                   <property name="currentText">
-                   <string>Всегда</string>
+                   <string>&lt;не добавлять&gt;</string>
                   </property>
+                  <item>
+                   <property name="text">
+                    <string>&lt;не добавлять&gt;</string>
+                   </property>
+                  </item>
                   <item>
                    <property name="text">
                     <string>Всегда</string>
@@ -211,6 +216,11 @@
                 </item>
                 <item row="6" column="1">
                  <widget class="QComboBox" name="comboBox_showanswer">
+                  <item>
+                   <property name="text">
+                    <string>&lt;не добавлять&gt;</string>
+                   </property>
+                  </item>
                   <item>
                    <property name="text">
                     <string>Выполнен</string>

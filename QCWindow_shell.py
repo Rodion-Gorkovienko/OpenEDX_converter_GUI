@@ -178,8 +178,11 @@ class QCWindow_math_expression(QCWindow_toler):
 
     def set_values(self, attr, text):
         super().set_values(attr, text)
-        n = ["cs", "ci"].index(attr.reg_type)
-        self.comboBox_reg_type.setCurrentIndex(n)
+        try:
+            n = ["cs", "ci"].index(attr.reg_type)
+            self.comboBox_reg_type.setCurrentIndex(n)
+        except ValueError:
+            self.comboBox_reg_type.setCurrentIndex(0)
         if attr.trailing_text != None:
             self.lineEdit_trailing_text.setText(attr.trailing_text)
         else:
@@ -254,8 +257,11 @@ class QCWindow_text_match(QCWindow_shell):
 
     def set_values(self, attr, text):
         super().set_values(attr, text)
-        n = ["cs", "ci", "regexp cs", "regexp ci"].index(attr.reg_type)
-        self.comboBox_reg_type.setCurrentIndex(n)
+        try:
+            n = ["cs", "ci", "regexp cs", "regexp ci"].index(attr.reg_type)
+            self.comboBox_reg_type.setCurrentIndex(n)
+        except ValueError:
+            self.comboBox_reg_type.setCurrentIndex(0)
         if attr.trailing_text != None:
             self.lineEdit_trailing_text.setText(attr.trailing_text)
         else:

@@ -130,6 +130,8 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
             l_attr.show_correctness = "always"
         elif library_show_correctness == "Никогда":
             l_attr.show_correctness = "never"
+        elif library_show_correctness == "<не добавлять>":
+            l_attr.show_correctness = None
         else:
             raise
         #show_answer
@@ -149,6 +151,8 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
             l_attr.showanswer = "past_due"
         elif library_showanswer == "Никогда":
             l_attr.showanswer = "never"
+        elif library_showanswer == "<не добавлять>":
+            l_attr.showanswer = None
         else:
             raise
         #rerandomize
@@ -256,7 +260,7 @@ class MainWindow_shell(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
             q_attr.trailing_tex_t = questions_trailing_text_t
 
         lib, problems, problems_names = docx_file_parsing.parse_file(file, l_attr, q_attr, questions_individually)
-        drop_OLX.drop_files(dir, lib, problems, problems_names, time)
+        drop_OLX.drop_files(dir, lib, problems, problems_names, library_library)
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow_shell()

@@ -26,11 +26,11 @@ def clear_dir(folder):
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-def drop_files(root_directory, lib, problems, names, time):
+def drop_files(root_directory, lib, problems, names, name):
     print("Result recording started")
     directory = root_directory + "\\library" 
-    if time != None and time != "":
-        directory += "_" + time
+    if name != None and name != "":
+        directory += "_" + name
     make_sure_path_exists(directory)
     clear_dir(directory)
     lib_file = codecs.open(directory + "\\library.xml", "w+", "UTF-8")

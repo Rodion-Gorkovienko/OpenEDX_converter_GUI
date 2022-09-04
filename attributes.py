@@ -9,11 +9,11 @@ class library_attributes():
         self.use_latex_compiler="false" 
         self.video_bumper="{}" 
         self.course_edit_method="Studio" 
-        self.show_correctness="always" 
+        self.show_correctness=None
         self.static_asset_path="" 
         self.hide_from_toc="false" 
         self.in_entrance_exam="false" 
-        self.showanswer="finished" 
+        self.showanswer=None
         self.display_name="Тест" 
         self.group_access="{}" 
         self.video_speed_optimizations="true" 

@@ -53,11 +53,13 @@ def add_library_attributes(library, attr):
     library.add_property("use_latex_compiler", attr.use_latex_compiler)
     library.add_property("video_bumper", attr.video_bumper)
     library.add_property("course_edit_method", attr.course_edit_method)
-    library.add_property("show_correctness", attr.show_correctness)
+    if attr.show_correctness != None:
+        library.add_property("show_correctness", attr.show_correctness)
     library.add_property("static_asset_path", attr.static_asset_path)
     library.add_property("hide_from_toc", attr.hide_from_toc)
     library.add_property("in_entrance_exam", attr.in_entrance_exam)
-    library.add_property("showanswer", attr.showanswer)
+    if attr.showanswer != None:
+        library.add_property("showanswer", attr.showanswer)
     library.add_display_name(attr.display_name)
     library.add_property("group_access", attr.group_access)
     library.add_property("video_speed_optimizations", attr.video_speed_optimizations)
